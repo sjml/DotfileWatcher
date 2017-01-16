@@ -1,3 +1,5 @@
+![DotfileWatcher log](DotfileWatcher/Assets.xcassets/AppIcon.appiconset/appicon_256.png)
+
 # DotfileWatcher
 
 Watches `~/.dotfiles` and pops a tiny icon in the status bar if anything's changed

@@ -13,10 +13,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         self.statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
         self.statusItem!.image = NSImage(named: "MenuBarImage")
-        self.statusItem!.button?.action = #selector(AppDelegate.indicatorClicked(_:))
         self.statusItem!.isVisible = false
         
         self.dotPath = NSHomeDirectory().appending("/.dotfiles")
+        
+        let menu = NSMenu()
+        
+        menu.addItem(NSMenuItem(title: "Open ~/.dotfiles…", action: #selector(openDotfiles), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Refresh", action: #selector(checkDotFiles), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.shared().terminate), keyEquivalent: ""))
+        
+        self.statusItem!.menu = menu
         
         checkDotFiles(nil)
         timerCheck = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(checkDotFiles), userInfo: nil, repeats: true)
@@ -26,7 +33,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // nada
     }
 
-    func indicatorClicked(_ sender: AnyObject?) {
+    func openDotfiles(_ sender: AnyObject?) {
         NSWorkspace.shared().openFile(self.dotPath, withApplication: "Visual Studio Code", andDeactivate: true)
     }
     
@@ -49,7 +56,5 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.statusItem?.isVisible = false
         }
     }
-    
-
 }
 

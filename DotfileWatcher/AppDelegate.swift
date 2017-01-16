@@ -12,7 +12,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         self.statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
-        self.statusItem!.image = NSImage(named: "menu-bar.pdf")
+        self.statusItem!.image = NSImage(named: "MenuBarImage")
         self.statusItem!.button?.action = #selector(AppDelegate.indicatorClicked(_:))
         self.statusItem!.isVisible = false
         

@@ -2,7 +2,7 @@
 
 # DotfileWatcher
 
-You can download a compiled version from [the releases page](https://github.com/sjml/DotfileWatcher/releases/tag/v1.0).
+You can download a compiled version from [the releases page](https://github.com/sjml/DotfileWatcher/releases/).
 
 Watches `~/.dotfiles` and pops a tiny icon in the status bar if anything's changed
 that hasn't been committed to git. When the icon is clicked, it opens `~/.dotfiles`

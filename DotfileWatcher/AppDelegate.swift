@@ -44,15 +44,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ aNotification: Notification) {
         // nada
     }
-
-    func openDotfiles(_ sender: AnyObject?) {
+    
+    func doesDotPathExist()-> Bool {
         var isDir: ObjCBool = false
         if (FileManager.default.fileExists(atPath: self.dotPath!, isDirectory: &isDir)) {
             if !isDir.boolValue {
-                return
+                return false
             }
         }
         else {
+            return false
+        }
+        
+        return true
+    }
+
+    func openDotfiles(_ sender: AnyObject?) {
+        if !self.doesDotPathExist() {
             return
         }
         var targetApp: String? = self.preferences.string(forKey: "targetApp")
@@ -86,13 +94,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func checkDotFiles(_ sender: AnyObject?) {
-        var isDir: ObjCBool = false
-        if (FileManager.default.fileExists(atPath: self.dotPath!, isDirectory: &isDir)) {
-            if !isDir.boolValue {
-                return
-            }
-        }
-        else {
+        if !self.doesDotPathExist() {
             return
         }
         

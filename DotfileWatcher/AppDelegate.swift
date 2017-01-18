@@ -9,7 +9,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var darkModeOn: Bool = false
     var timerCheck: Timer!
     var dotPath: String? = ""
+    var displayDotPath: String = ""
     let preferences = UserDefaults.standard
+    
+    var openMenuItem: NSMenuItem? = nil
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         self.statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
@@ -21,23 +24,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             targetApp = "Finder"
         }
         
-        // so an intrepid hacker could override it with a defaults command
-        self.dotPath = self.preferences.string(forKey: "dotPath")
-        if (self.dotPath == nil || self.dotPath?.characters.count == 0 ) {
-            self.dotPath = NSHomeDirectory().appending("/.dotfiles")
-        }
-        
         let menu = NSMenu()
-        
-        menu.addItem(NSMenuItem(title: "Open ~/.dotfiles…", action: #selector(openDotfiles), keyEquivalent: ""))
+        self.openMenuItem = NSMenuItem(title: "Open \(self.displayDotPath)…", action: #selector(openDotfiles), keyEquivalent: "")
+        menu.addItem(self.openMenuItem!)
         menu.addItem(NSMenuItem(title: "Refresh", action: #selector(checkDotFiles), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "Set watched directory…", action: #selector(chooseDotPath), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Set app…", action: #selector(chooseApp), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.shared().terminate), keyEquivalent: ""))
-        
         self.statusItem!.menu = menu
         
-        checkDotFiles(nil)
+        var dotPath: String? = self.preferences.string(forKey: "dotPath")
+        if (dotPath == nil || dotPath?.characters.count == 0 ) {
+            self.setDotPath(newDotPath: NSHomeDirectory().appending("/.dotfiles"))
+        }
+        else {
+            self.setDotPath(newDotPath: dotPath!)
+        }
+        
         timerCheck = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(checkDotFiles), userInfo: nil, repeats: true)
     }
 
@@ -45,9 +49,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // nada
     }
     
-    func doesDotPathExist()-> Bool {
+    func doesPathExist(testingPath: String)-> Bool {
         var isDir: ObjCBool = false
-        if (FileManager.default.fileExists(atPath: self.dotPath!, isDirectory: &isDir)) {
+        if (FileManager.default.fileExists(atPath: testingPath, isDirectory: &isDir)) {
             if !isDir.boolValue {
                 return false
             }
@@ -60,7 +64,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func openDotfiles(_ sender: AnyObject?) {
-        if !self.doesDotPathExist() {
+        if !self.doesPathExist(testingPath: self.dotPath!) {
             return
         }
         var targetApp: String? = self.preferences.string(forKey: "targetApp")
@@ -71,10 +75,47 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSWorkspace.shared().openFile(self.dotPath!, withApplication: targetApp, andDeactivate: true)
     }
     
+    func chooseDotPath(_ sender: AnyObject?) {
+        let openPanel = NSOpenPanel()
+        
+        openPanel.title = "Choose an directory to watch."
+        openPanel.message = openPanel.title
+        openPanel.prompt = "Choose"
+        openPanel.showsResizeIndicator = true
+        openPanel.canChooseDirectories = true
+        openPanel.canChooseFiles = false
+        openPanel.showsHiddenFiles = true
+        openPanel.canCreateDirectories = false
+        openPanel.allowsMultipleSelection = false
+        openPanel.directoryURL = NSURL.fileURL(withPath: NSHomeDirectory())
+        openPanel.allowedFileTypes = ["app"]
+        
+        if (openPanel.runModal() == NSModalResponseOK) {
+            self.setDotPath(newDotPath: (openPanel.url?.path)!)
+        }
+        openPanel.close()
+    }
+    
+    func setDotPath(newDotPath: String) {
+        if !self.doesPathExist(testingPath: newDotPath) {
+            self.openMenuItem!.title = "[No valid dotpath.]"
+            self.openMenuItem!.action = nil
+            self.statusItem?.isVisible = true
+            return
+        }
+        
+        self.preferences.set(newDotPath, forKey: "dotPath")
+        self.dotPath = newDotPath
+        self.displayDotPath = newDotPath.replacingOccurrences(of: NSHomeDirectory(), with: "~")
+        self.openMenuItem!.title = "Open \(self.displayDotPath)…"
+        self.openMenuItem?.action = #selector(openDotfiles)
+        checkDotFiles(nil)
+    }
+    
     func chooseApp(_ sender: AnyObject?) {
         let openPanel = NSOpenPanel()
         
-        openPanel.title = "Choose an application to open your ~/.dotfiles directory."
+        openPanel.title = "Choose an application to open \(self.displayDotPath)."
         openPanel.message = openPanel.title
         openPanel.prompt = "Choose"
         openPanel.showsResizeIndicator = true
@@ -88,24 +129,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.preferences.set(openPanel.url, forKey: "targetApp")
             self.openDotfiles(nil)
         }
-        
-        // don't know if this is necessary, but it *does* clear out some memory...
         openPanel.close()
     }
     
     func checkDotFiles(_ sender: AnyObject?) {
-        if !self.doesDotPathExist() {
+        if !self.doesPathExist(testingPath: self.dotPath!) {
+            self.statusItem?.isVisible = true
             return
         }
         
         let check = Process()
         let output = Pipe()
+        let error = Pipe()
         check.currentDirectoryPath = self.dotPath!
         check.launchPath = "/usr/bin/env"
         check.standardOutput = output
+        check.standardError = error
         check.arguments = ["git", "status", "--porcelain"]
         check.launch()
         check.waitUntilExit()
+        
+        let errorOutput = error.fileHandleForReading.readDataToEndOfFile()
+        if (errorOutput.count > 0) {
+            // not a git directory; leave it visible
+            self.statusItem?.isVisible = true
+            self.openMenuItem?.title = "[Not a git repository.]"
+            self.openMenuItem?.action = nil
+            return
+        }
+        else {
+            self.openMenuItem?.action = #selector(openDotfiles)
+        }
         
         let out = output.fileHandleForReading.readDataToEndOfFile()
         if (out.count > 0) {

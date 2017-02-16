@@ -4,10 +4,10 @@
 
 You can download a compiled version from [the releases page](https://github.com/sjml/DotfileWatcher/releases/).
 
-Watches `~/.dotfiles` and pops a tiny icon in the status bar if anything's changed
-that hasn't been committed to git. When the icon is clicked, it opens `~/.dotfiles`
-in the Finder or an app of your choice for inspection. 
+Watches a designated directory (default: `~/.dotfiles`) and pops an icon in
+the status bar if anything's changed that hasn't been committed to git. From
+the icon, you can open `~/.dotfiles` the app of your choice (default: Finder).
 
-Throw it in Login Items and let it do it's thing. 
+Throw it in Login Items and let it do it's thing.
 
-Could be set up to be more configurable, but it does what I need. 
+Could be set up to be more configurable, but it does what I need.

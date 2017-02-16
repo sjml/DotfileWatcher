@@ -6,7 +6,8 @@ You can download a compiled version from [the releases page](https://github.com/
 
 Watches a designated directory (default: `~/.dotfiles`) and pops an icon in
 the status bar if anything's changed that hasn't been committed to git. From
-the icon, you can open `~/.dotfiles` the app of your choice (default: Finder).
+the icon, you can open the watched directory the app of your choice (default: 
+Finder).
 
 Throw it in Login Items and let it do it's thing.
 

@@ -78,7 +78,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func chooseDotPath(_ sender: AnyObject?) {
         let openPanel = NSOpenPanel()
         
-        openPanel.title = "Choose an directory to watch."
+        openPanel.title = "Choose a directory to watch."
         openPanel.message = openPanel.title
         openPanel.prompt = "Choose"
         openPanel.showsResizeIndicator = true
@@ -90,6 +90,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         openPanel.directoryURL = NSURL.fileURL(withPath: NSHomeDirectory())
         openPanel.allowedFileTypes = ["app"]
         
+        NSRunningApplication.current().activate(options: NSApplicationActivationOptions.activateIgnoringOtherApps);
         if (openPanel.runModal() == NSModalResponseOK) {
             self.setDotPath(newDotPath: (openPanel.url?.path)!)
         }
@@ -125,6 +126,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         openPanel.directoryURL = NSURL.fileURL(withPath: "/Applications")
         openPanel.allowedFileTypes = ["app"]
         
+        NSRunningApplication.current().activate(options: NSApplicationActivationOptions.activateIgnoringOtherApps);
         if (openPanel.runModal() == NSModalResponseOK) {
             self.preferences.set(openPanel.url, forKey: "targetApp")
             self.openDotfiles(nil)

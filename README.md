@@ -2,7 +2,7 @@
 
 # DotfileWatcher
 
-You can download a compiled version from [the releases page](https://github.com/sjml/DotfileWatcher/releases/).
+You can download a compiled version from [the latest release](https://github.com/sjml/DotfileWatcher/releases/latest).
 
 Watches a designated directory (default: `~/.dotfiles`) and pops an icon in
 the status bar if anything's changed that hasn't been committed to git. From

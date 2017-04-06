@@ -9,6 +9,6 @@ the status bar if anything's changed that hasn't been committed to git. From
 the icon, you can open the watched directory with the app of your choice (default: 
 Finder).
 
-Throw it in Login Items and let it do it's thing.
+Throw it in Login Items and let it do its thing.
 
 Could be set up to be more configurable, but it does what I need.

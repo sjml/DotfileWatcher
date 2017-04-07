@@ -11,4 +11,4 @@ Finder).
 
 Throw it in Login Items and let it do its thing.
 
-Could be set up to be more configurable, but it does what I need.
+Could be set up to be more configurable, but it does what I need. Note that it just polls the directory every minute instead of watching for changes so it can pop more immediately. The file watching API is annoying; one-minute polling is easy. Here we are. 

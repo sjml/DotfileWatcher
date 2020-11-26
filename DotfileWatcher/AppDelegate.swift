@@ -15,12 +15,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var openMenuItem: NSMenuItem? = nil
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        self.statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
+        self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.statusItem!.image = NSImage(named: "MenuBarImage")
         self.statusItem!.isVisible = false
         
         var targetApp: String? = self.preferences.string(forKey: "targetApp")
-        if (targetApp == nil || targetApp?.characters.count == 0 ) {
+        if (targetApp == nil || targetApp?.count == 0 ) {
             targetApp = "Finder"
         }
         
@@ -31,11 +31,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Set watched directory…", action: #selector(chooseDotPath), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Set app…", action: #selector(chooseApp), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.shared().terminate), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.shared.terminate), keyEquivalent: ""))
         self.statusItem!.menu = menu
         
-        var dotPath: String? = self.preferences.string(forKey: "dotPath")
-        if (dotPath == nil || dotPath?.characters.count == 0 ) {
+        let dotPath: String? = self.preferences.string(forKey: "dotPath")
+        if (dotPath == nil || dotPath?.count == 0 ) {
             self.setDotPath(newDotPath: NSHomeDirectory().appending("/.dotfiles"))
         }
         else {
@@ -63,19 +63,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
-    func openDotfiles(_ sender: AnyObject?) {
+    @objc func openDotfiles(_ sender: AnyObject?) {
         if !self.doesPathExist(testingPath: self.dotPath!) {
             return
         }
         var targetApp: String? = self.preferences.string(forKey: "targetApp")
-        if (targetApp == nil || targetApp?.characters.count == 0 ) {
+        if (targetApp == nil || targetApp?.count == 0 ) {
             targetApp = "Finder"
         }
         
-        NSWorkspace.shared().openFile(self.dotPath!, withApplication: targetApp, andDeactivate: true)
+        NSWorkspace.shared.openFile(self.dotPath!, withApplication: targetApp, andDeactivate: true)
     }
     
-    func chooseDotPath(_ sender: AnyObject?) {
+    @objc func chooseDotPath(_ sender: AnyObject?) {
         let openPanel = NSOpenPanel()
         
         openPanel.title = "Choose a directory to watch."
@@ -90,8 +90,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         openPanel.directoryURL = NSURL.fileURL(withPath: NSHomeDirectory())
         openPanel.allowedFileTypes = ["app"]
         
-        NSRunningApplication.current().activate(options: NSApplicationActivationOptions.activateIgnoringOtherApps);
-        if (openPanel.runModal() == NSModalResponseOK) {
+        NSRunningApplication.current.activate(options: NSApplication.ActivationOptions.activateIgnoringOtherApps);
+        if (openPanel.runModal() == NSApplication.ModalResponse.OK) {
             self.setDotPath(newDotPath: (openPanel.url?.path)!)
         }
         openPanel.close()
@@ -113,7 +113,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         checkDotFiles(nil)
     }
     
-    func chooseApp(_ sender: AnyObject?) {
+    @objc func chooseApp(_ sender: AnyObject?) {
         let openPanel = NSOpenPanel()
         
         openPanel.title = "Choose an application to open \(self.displayDotPath)."
@@ -126,15 +126,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         openPanel.directoryURL = NSURL.fileURL(withPath: "/Applications")
         openPanel.allowedFileTypes = ["app"]
         
-        NSRunningApplication.current().activate(options: NSApplicationActivationOptions.activateIgnoringOtherApps);
-        if (openPanel.runModal() == NSModalResponseOK) {
+        NSRunningApplication.current.activate(options: NSApplication.ActivationOptions.activateIgnoringOtherApps);
+        if (openPanel.runModal() == NSApplication.ModalResponse.OK) {
             self.preferences.set(openPanel.url, forKey: "targetApp")
             self.openDotfiles(nil)
         }
         openPanel.close()
     }
     
-    func checkDotFiles(_ sender: AnyObject?) {
+    @objc func checkDotFiles(_ sender: AnyObject?) {
         if !self.doesPathExist(testingPath: self.dotPath!) {
             self.statusItem?.isVisible = true
             return

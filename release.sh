@@ -16,13 +16,14 @@ if [[ ! -f ${UPLOAD_ASSET} ]]; then
 fi
 
 echo "Checking asset..."
+rm -rf ${BUILD_DIR}/${APP_NAME}.app
 unzip ${UPLOAD_ASSET} -d ${BUILD_DIR}
-codesign -vvvv ${APP_NAME}.app
+codesign -vvvv ${BUILD_DIR}/${APP_NAME}.app
 if [[ $? -ne 0 ]]; then
   echo "App isn't signed."
   exit 1
 fi
-xcrn stapler validate ${APP_NAME}.app
+xcrun stapler validate ${BUILD_DIR}/${APP_NAME}.app
 if [[ $? -ne 0 ]]; then
   echo "App isn't validated."
   exit 1

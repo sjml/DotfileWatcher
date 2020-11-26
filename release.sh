@@ -37,4 +37,4 @@ read -p "New release tag? (Last one was ${LAST_RELEASE}.) " RELEASE_TAG
 echo "What should the release message be?"
 read -p "> " MESSAGE
 
-hub release create -a ${UPLOAD_ASSET} -m ${MESSAGE} ${RELEASE_TAG}
+hub release create -a ${UPLOAD_ASSET} -m "${RELEASE_TAG}" "${MESSAGE}" ${RELEASE_TAG}
